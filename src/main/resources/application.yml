@@ -13,3 +13,7 @@ spring:
       ddl-auto: create-drop
     show-sql: true
     generate-ddl: true
+api:
+  base-api: /api
+  api-version: v1
+debug: true
