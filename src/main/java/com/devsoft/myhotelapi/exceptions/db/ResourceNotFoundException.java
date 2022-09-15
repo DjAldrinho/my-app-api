@@ -2,7 +2,7 @@ package com.devsoft.myhotelapi.exceptions.db;
 
 
 public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(Long id, String table) {
-        super("Resource not found for id: " + id + " in " + table);
+    public ResourceNotFoundException(String name, String fieldName, String table) {
+        super(String.format("The resource for %s: %s not found in %s", fieldName, name, table));
     }
 }

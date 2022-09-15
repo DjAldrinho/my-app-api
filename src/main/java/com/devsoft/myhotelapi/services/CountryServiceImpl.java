@@ -13,6 +13,7 @@ public class CountryServiceImpl implements ICountryService {
 
     private final ICountryRepository countryRepository;
 
+
     public CountryServiceImpl(ICountryRepository countryRepository) {
         this.countryRepository = countryRepository;
     }
@@ -40,5 +41,17 @@ public class CountryServiceImpl implements ICountryService {
     @Transactional
     public void delete(Long id) {
         this.countryRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Country> findCountryByName(String name) {
+        return this.countryRepository.findCountryByName(name);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Country> searchCountriesByName(String name) {
+        return this.countryRepository.findByNameContainingIgnoreCase(name);
     }
 }

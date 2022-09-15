@@ -1,18 +1,19 @@
 package com.devsoft.myhotelapi.models;
 
 import com.devsoft.myhotelapi.models.generics.ModelTimestamp;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity(name = "users")
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 public class User extends ModelTimestamp implements Serializable {
 
@@ -28,12 +29,14 @@ public class User extends ModelTimestamp implements Serializable {
 
     @Email
     @NotBlank
+    @Column(unique = true)
     private String email;
 
     @NotBlank
     private String password;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Hotel hotel;
 
     public User(String name, String email, String password) {
@@ -47,5 +50,18 @@ public class User extends ModelTimestamp implements Serializable {
         this.email = email;
         this.password = password;
         this.hotel = hotel;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return id != null && Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
