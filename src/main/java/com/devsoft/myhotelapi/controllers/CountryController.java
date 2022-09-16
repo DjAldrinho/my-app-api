@@ -1,9 +1,12 @@
 package com.devsoft.myhotelapi.controllers;
 
+import com.devsoft.myhotelapi.Tables;
 import com.devsoft.myhotelapi.exceptions.db.ResourceExistsException;
 import com.devsoft.myhotelapi.exceptions.db.ResourceNotFoundException;
 import com.devsoft.myhotelapi.helpers.LocationHelper;
+import com.devsoft.myhotelapi.models.City;
 import com.devsoft.myhotelapi.models.Country;
+import com.devsoft.myhotelapi.services.ICityService;
 import com.devsoft.myhotelapi.services.ICountryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("${api.base-api}/${api.api-version}/countries")
@@ -18,10 +22,12 @@ public class CountryController {
 
     private final ICountryService countryService;
 
-    private static final String TABLE = "country";
+    private final ICityService cityService;
 
-    public CountryController(ICountryService countryService) {
+
+    public CountryController(ICountryService countryService, ICityService cityService) {
         this.countryService = countryService;
+        this.cityService = cityService;
     }
 
     @GetMapping
@@ -39,16 +45,16 @@ public class CountryController {
 
     @GetMapping("/search/{name}")
     public ResponseEntity<List<Country>> getCountryByName(@PathVariable("name") String name) {
-        return ResponseEntity.ok(this.countryService.searchCountriesByName(name));
+        return ResponseEntity.ok(this.countryService.searchByName(name));
     }
 
     @PostMapping
     public ResponseEntity<?> createCountry(@Valid @RequestBody Country newCountry) {
 
-        boolean exists = this.existsCountryByName(newCountry.getName());
+        boolean exists = this.countryService.findCountryByName(newCountry.getName()).isPresent();
 
         if (exists) {
-            throw new ResourceExistsException(newCountry.getName(), TABLE);
+            throw new ResourceExistsException(newCountry.getName(), Tables.COUNTRY.getValue());
         }
 
         Country country = this.countryService.save(newCountry);
@@ -63,12 +69,12 @@ public class CountryController {
 
         Country country = this.getCountryModelById(id);
 
-        boolean existsByName = this.existsCountryByName(newCountry.getName());
+        boolean existsByName = this.countryService.findCountryByName(newCountry.getName()).isPresent();
 
         if (existsByName) {
             Country countryExistsByName = this.getCountryModelByName(newCountry.getName());
             if (!country.getId().equals(countryExistsByName.getId())) {
-                throw new ResourceExistsException(newCountry.getName(), TABLE);
+                throw new ResourceExistsException(newCountry.getName(), Tables.COUNTRY.getValue());
             }
         }
 
@@ -95,21 +101,66 @@ public class CountryController {
         return ResponseEntity.internalServerError().build();
     }
 
+
+    @GetMapping("/{id}/cities")
+    public ResponseEntity<Set<City>> getCities(@PathVariable("id") Long id) {
+
+        Country country = this.getCountryModelById(id);
+
+        return ResponseEntity.ok(country.getCities());
+    }
+
+
+    @PostMapping("/{id}/cities")
+    public ResponseEntity<?> createCity(@PathVariable("id") Long id, @Valid @RequestBody City newCity) {
+
+        boolean existsByName = this.cityService.existsCitiesByNameAndCountryId(newCity.getName(), id);
+
+        if (existsByName) {
+            throw new ResourceExistsException(newCity.getName(), Tables.CITY.getValue());
+        }
+
+        Country country = this.getCountryModelById(id);
+        country.addCity(newCity);
+        this.countryService.save(country);
+        URI location = LocationHelper.getLocation(country.getId());
+        return ResponseEntity.created(location).body(country);
+    }
+
+    @GetMapping("/{countryId}/cities/{id}")
+    public ResponseEntity<?> getCity(@PathVariable("countryId") Long countryId, @PathVariable("id") Long id) {
+
+        boolean exists = this.cityService.existsCityByIdAndCountryId(id, countryId);
+
+        if (!exists) {
+            throw new ResourceNotFoundException("The city not found in this country");
+        }
+
+        return ResponseEntity.ok(this.cityService.findOne(id));
+    }
+
+    @DeleteMapping("/{countryId}/cities/{id}")
+    public ResponseEntity<?> deleteCity(@PathVariable("countryId") Long countryId, @PathVariable("id") Long id) {
+
+        Country country = this.getCountryModelById(countryId);
+
+        if (country != null) {
+            City city = this.cityService.findOne(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(id.toString(), "id", Tables.CITY.getValue()));
+
+            this.cityService.delete(city.getId());
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
     private Country getCountryModelById(Long id) {
         return this.countryService.findOne(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id.toString(), "id", TABLE));
+                .orElseThrow(() -> new ResourceNotFoundException(id.toString(), "id", Tables.COUNTRY.getValue()));
     }
 
     private Country getCountryModelByName(String name) {
         return this.countryService.findCountryByName(name)
-                .orElseThrow(() -> new ResourceNotFoundException(name, "name", TABLE));
-    }
-
-    private boolean existsCountryByName(String name) {
-        return this.countryService.findCountryByName(name).isPresent();
-    }
-
-    private boolean existsCountryById(Long id) {
-        return this.countryService.findOne(id).isPresent();
+                .orElseThrow(() -> new ResourceNotFoundException(name, "name", Tables.COUNTRY.getValue()));
     }
 }

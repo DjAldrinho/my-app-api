@@ -43,15 +43,16 @@ public class CountryServiceImpl implements ICountryService {
         this.countryRepository.deleteById(id);
     }
 
+
     @Override
     @Transactional(readOnly = true)
-    public Optional<Country> findCountryByName(String name) {
-        return this.countryRepository.findCountryByName(name);
+    public List<Country> searchByName(String name) {
+        return this.countryRepository.findByNameContainingIgnoreCase(name);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Country> searchCountriesByName(String name) {
-        return this.countryRepository.findByNameContainingIgnoreCase(name);
+    public Optional<Country> findCountryByName(String name) {
+        return this.countryRepository.findCountryByName(name);
     }
 }

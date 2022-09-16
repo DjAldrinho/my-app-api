@@ -1,7 +1,7 @@
 package com.devsoft.myhotelapi.models;
 
 import com.devsoft.myhotelapi.models.generics.ModelTimestamp;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Hibernate;
@@ -9,9 +9,9 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 
 @Getter
@@ -29,19 +29,23 @@ public class Country extends ModelTimestamp implements Serializable {
     @Column(unique = true)
     private String name;
 
-    @JsonIgnore
-    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<City> cities;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "country", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<City> cities;
 
     public Country() {
-        this.cities = new ArrayList<>();
+        this.cities = new HashSet<>();
     }
 
-    public Country addCity(City city) {
-        if (!this.cities.contains(city)) {
-            this.cities.add(city);
-        }
-        return this;
+    public void addCity(City city) {
+        cities.add(city);
+        city.setCountry(this);
+    }
+
+    public void removeCity(City city) {
+        cities.remove(city);
+        city.setCountry(null);
+        ;
     }
 
     @Override

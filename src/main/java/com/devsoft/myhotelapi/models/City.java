@@ -1,7 +1,10 @@
 package com.devsoft.myhotelapi.models;
 
 import com.devsoft.myhotelapi.models.generics.ModelTimestamp;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -18,19 +21,16 @@ public class City extends ModelTimestamp implements Serializable {
     private static Long serialVersionUID = 2L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
-    @Column(unique = true)
     private String name;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Country country;
 
-    public City(String name, Country country) {
-        this.name = name;
-        this.country = country;
-    }
+    @JsonBackReference
+    @ManyToOne
+    private Country country;
 
     @Override
     public boolean equals(Object o) {
