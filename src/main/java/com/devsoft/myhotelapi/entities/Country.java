@@ -1,9 +1,10 @@
-package com.devsoft.myhotelapi.models;
+package com.devsoft.myhotelapi.entities;
 
-import com.devsoft.myhotelapi.models.generics.ModelTimestamp;
+import com.devsoft.myhotelapi.entities.generics.ModelTimestamp;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@ToString
 public class Country extends ModelTimestamp implements Serializable {
 
     private static final Long serialVersionUID = 2L;
@@ -31,6 +33,7 @@ public class Country extends ModelTimestamp implements Serializable {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "country", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Set<City> cities;
 
     public Country() {
@@ -45,7 +48,6 @@ public class Country extends ModelTimestamp implements Serializable {
     public void removeCity(City city) {
         cities.remove(city);
         city.setCountry(null);
-        ;
     }
 
     @Override

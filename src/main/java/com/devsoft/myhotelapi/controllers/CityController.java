@@ -1,11 +1,11 @@
 package com.devsoft.myhotelapi.controllers;
 
-import com.devsoft.myhotelapi.Tables;
+import com.devsoft.myhotelapi.builders.LocationBuilder;
+import com.devsoft.myhotelapi.enums.Tables;
 import com.devsoft.myhotelapi.exceptions.db.ResourceExistsException;
 import com.devsoft.myhotelapi.exceptions.db.ResourceNotFoundException;
-import com.devsoft.myhotelapi.helpers.LocationHelper;
-import com.devsoft.myhotelapi.models.City;
-import com.devsoft.myhotelapi.models.Country;
+import com.devsoft.myhotelapi.entities.City;
+import com.devsoft.myhotelapi.entities.Country;
 import com.devsoft.myhotelapi.services.ICityService;
 import com.devsoft.myhotelapi.services.ICountryService;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +61,7 @@ public class CityController {
         country.addCity(city);
         this.countryService.save(country);
 
-        URI location = LocationHelper.getLocation(city.getId());
+        URI location = LocationBuilder.generateLocation(city.getId());
 
         return ResponseEntity.created(location).body(city);
     }

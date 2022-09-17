@@ -1,43 +1,42 @@
-package com.devsoft.myhotelapi.models;
+package com.devsoft.myhotelapi.entities;
 
-import com.devsoft.myhotelapi.models.generics.ModelTimestamp;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.devsoft.myhotelapi.entities.generics.ModelTimestamp;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
-@Entity
 @Getter
 @Setter
-@NoArgsConstructor
-public class City extends ModelTimestamp implements Serializable {
+@ToString
+@RequiredArgsConstructor
+@Entity
+public class Role extends ModelTimestamp implements Serializable {
 
-    private static Long serialVersionUID = 2L;
+    private static final Long serialVersionUID = 2L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @NotBlank
     private String name;
 
-
-    @JsonBackReference
-    @ManyToOne
-    private Country country;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private Set<User> users;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        City city = (City) o;
-        return id != null && Objects.equals(id, city.id);
+        Role role = (Role) o;
+        return id != null && Objects.equals(id, role.id);
     }
 
     @Override

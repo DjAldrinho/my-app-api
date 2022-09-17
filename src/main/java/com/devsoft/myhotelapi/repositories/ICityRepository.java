@@ -1,6 +1,6 @@
 package com.devsoft.myhotelapi.repositories;
 
-import com.devsoft.myhotelapi.models.City;
+import com.devsoft.myhotelapi.entities.City;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

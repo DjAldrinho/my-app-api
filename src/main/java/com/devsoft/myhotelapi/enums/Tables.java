@@ -1,4 +1,4 @@
-package com.devsoft.myhotelapi;
+package com.devsoft.myhotelapi.enums;
 
 import lombok.Getter;
 

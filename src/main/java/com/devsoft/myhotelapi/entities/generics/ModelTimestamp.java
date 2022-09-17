@@ -1,4 +1,4 @@
-package com.devsoft.myhotelapi.models.generics;
+package com.devsoft.myhotelapi.entities.generics;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;

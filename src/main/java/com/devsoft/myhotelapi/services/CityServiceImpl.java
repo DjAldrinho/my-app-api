@@ -1,6 +1,6 @@
 package com.devsoft.myhotelapi.services;
 
-import com.devsoft.myhotelapi.models.City;
+import com.devsoft.myhotelapi.entities.City;
 import com.devsoft.myhotelapi.repositories.ICityRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-package com.devsoft.myhotelapi.models.generics;
+package com.devsoft.myhotelapi.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.devsoft.myhotelapi.builders;
 
-import com.devsoft.myhotelapi.models.generics.ValidationError;
+import com.devsoft.myhotelapi.models.ValidationError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

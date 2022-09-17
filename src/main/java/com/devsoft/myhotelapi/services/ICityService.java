@@ -1,6 +1,6 @@
 package com.devsoft.myhotelapi.services;
 
-import com.devsoft.myhotelapi.models.City;
+import com.devsoft.myhotelapi.entities.City;
 import com.devsoft.myhotelapi.services.base.IBaseService;
 import com.devsoft.myhotelapi.services.base.Searchable;
 

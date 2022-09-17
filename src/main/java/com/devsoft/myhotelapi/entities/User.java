@@ -1,7 +1,11 @@
-package com.devsoft.myhotelapi.models;
+package com.devsoft.myhotelapi.entities;
 
-import com.devsoft.myhotelapi.models.generics.ModelTimestamp;
-import lombok.*;
+import com.devsoft.myhotelapi.entities.generics.ModelTimestamp;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -9,6 +13,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity(name = "users")
 @Getter
@@ -35,9 +40,14 @@ public class User extends ModelTimestamp implements Serializable {
     @NotBlank
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Role> roles;
+
+
+    @JsonManagedReference
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
-    private Hotel hotel;
+    private Place place;
 
     public User(String name, String email, String password) {
         this.name = name;
@@ -45,11 +55,11 @@ public class User extends ModelTimestamp implements Serializable {
         this.password = password;
     }
 
-    public User(String name, String email, String password, Hotel hotel) {
+    public User(String name, String email, String password, Place place) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.hotel = hotel;
+        this.place = place;
     }
 
     @Override
